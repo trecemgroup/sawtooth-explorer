@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright 2018 by Cloudsoft Corporation Limited
 #
 # Licensed to the Apache Software Foundation (ASF) under one
@@ -17,20 +18,9 @@
 # specific language governing permissions and limitations
 # under the License.
 
-version: "2.1"
+if [ "${SAWTOOTH_REST_API}" ] ; then
+  sed -i "s|localhost|${SAWTOOTH_REST_API}|g" src/environments/environment.prod.ts
+fi
 
-services:
-  rest-api-proxy:
-    image: nginx
-    volumes:
-      - "./docker/nginx.conf:/etc/nginx/nginx.conf:ro"
-    ports:
-      - "8090:8090"
-    command: ["nginx", "-g", "daemon off;"]
-  sawtooth-explorer:
-    build: .
-    image: sawtooth-explorer
-    depends_on:
-      - rest-api-proxy
-    ports:
-      - "4201:4201"
+npm build --prod
+npm start -- --env=prod --host=0.0.0.0 --port=4201
